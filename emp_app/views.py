@@ -1,6 +1,9 @@
 from django.shortcuts import render,HttpResponse
 from .models import Employee, Roles, Department
 
+
+from django.db.models import Q
+
 # Create your views here.
 
 
@@ -61,4 +64,34 @@ def remove_emp(request, emp_id=0):
 
 
 def search_emp(request):
+    if request.method == 'POST':
+        name = request.POST['name']
+        dept = request.POST['dept']
+        role = request.POST['role']
+
+        emps= Employee.objects.alll()
+        if name:
+            emps = emps.filter(Q(first_name__icontains = name) | Q(last_name__icontains = name))
+        if dept:
+            emps = emps.filter(dept__name == dept)
+        if role:
+            emps = emps.filter(role__name == role)
+
+        context = {
+            'emps' : emps
+        }
+
+        return render(request, 'all_emp.html',context)
+    
+    elif request.method == 'GET' :
+        return render(request, 'search_emp.html')
+    else:
+        return HttpResponse('An Exceptions Occurs')
+
+
+
+
+    
+        
+
     return render(request, 'search_emp.html')
